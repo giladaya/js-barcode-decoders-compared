@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Barcode.js Test</title>
+        
+    <style>
+    </style>
+    
+  </head>
+  
+  <body>
+    <a href="https://github.com/liip/barcode.js">Barcode.js</a><br/>
+    <div id="output">...</div>
+    <script src="./barcode.js"></script>
+    <script src="../samples/images.js"></script>
+    <script src="../lib/Stats.js"></script>
+    <script>
+const BASE_URL = '/samples/'
+var curIdx = 0;
+
+var $output = document.getElementById('output');
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+
+var stats = new Stats($output);
+
+// start the process
+decodeImage(images[curIdx]);
+
+function decodeImage(url) {
+  var img = document.createElement('img');
+  // img.crossOrigin = "No CORS";
+  img.onload = function() {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0 );
+
+    stats.startProc();
+    var barcode = new Barcode(ctx, canvas.width, canvas.height);
+    var line = barcode.scan();
+    handleDecodeResult(line);
+  }
+  img.onerror = function(err) {
+    console.log('Error loading image ', url);
+  }
+  img.src = BASE_URL+url;
+}
+
+function handleDecodeResult(result) {
+  var resStr = '';
+  if (result) {
+    resStr = result.isbn;
+  }
+
+  stats.endProc(images[curIdx], resStr);
+
+  if (curIdx < images.length - 1) {
+    //next
+    curIdx++;
+    decodeImage(images[curIdx]);
+  } else {
+    console.log('Done');
+  }
+}
+    </script>
+  </body>
+</html>

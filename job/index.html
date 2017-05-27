@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JOB Test</title>
+        
+    <style>
+    </style>
+    
+  </head>
+  
+  <body>
+    <a href="https://github.com/EddieLa/JOB">JOB</a><br/>
+    <div id="output">...</div>
+    <script src="JOB.js"></script>
+    <script src="exif.js"></script>
+    <script src="../samples/images.js"></script>
+    <script src="../lib/Stats.js"></script>
+    <script>
+const BASE_URL = '/samples/'
+var curIdx = 0;
+
+var $output = document.getElementById('output');
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+
+var stats = new Stats($output);
+
+JOB.Init();
+JOB.SetImageCallback(handleDecodeResult);
+JOB.PostOrientation = true;
+JOB.OrientationCallback = function(result) {
+  canvas.width = result.width;
+  canvas.height = result.height;
+  var data = ctx.getImageData(0,0,canvas.width,canvas.height);
+  for(var i = 0; i < data.data.length; i++) {
+    data.data[i] = result.data[i];
+  }
+  ctx.putImageData(data,0,0);
+};
+
+// start processing
+decodeImage(images[curIdx]);
+
+function decodeImage(url) {
+  var img = document.createElement('img');
+  // img.crossOrigin = "No CORS";
+  img.onload = function() {
+    stats.startProc();
+    JOB.DecodeImage(img);
+  }
+  img.onerror = function(err) {
+    console.log('Error loading image ', url);
+  }
+  img.src = BASE_URL+url;
+}
+
+function handleDecodeResult(result) {
+  var resStr = '';
+  
+  if (result.length > 1) {
+    console.log('Multi');
+    result = result.filter(function (val) {
+      return val.Format === 'EAN-13';
+    })
+  }
+  if (result.length > 0) {
+    resStr = result[0].Value.toString();
+  }
+
+  stats.endProc(images[curIdx], resStr);
+
+  if (curIdx < images.length - 1) {
+    //next
+    curIdx++;
+    decodeImage(images[curIdx]);
+  } else {
+    console.log('Done');
+  }
+}
+    </script>
+  </body>
+</html>

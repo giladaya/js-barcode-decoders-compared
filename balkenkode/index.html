@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SlaRle Test</title>
+        
+    <style>
+    </style>
+    
+  </head>
+  
+  <body>
+    <a href="https://bitbucket.org/jrosskopf/balkenkode">Balkenkode</a><br/>
+    <pre id="barcode-pre"></pre>
+    <div id="output">...</div>
+    <script tpye="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.1.7/underscore-min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.5.3/backbone-min.js"></script>
+    <script src="./main.js"></script>
+    <script src="../samples/images.js"></script>
+    <script src="../lib/Stats.js"></script>
+    <script>
+
+const BASE_URL = '/samples/'
+var curIdx = 0;
+
+var $output = document.getElementById('output');
+var origCvs = document.createElement('canvas');
+var monoCvs = document.createElement('canvas');
+
+var stats = new Stats($output);
+
+// start processing
+decodeImage(images[curIdx]);
+
+function decodeImage(url) {
+  var img = document.createElement('img');
+  // img.crossOrigin = "No CORS";
+  img.onload = function() {
+    stats.startProc();
+    processImage(img);
+  }
+  img.onerror = function(err) {
+    console.log('Error loading image ', url);
+  }
+  img.src = BASE_URL+url;
+}
+
+function processImage(img)
+{
+    var width = parseInt(img.width);
+    var height = parseInt(img.height);
+
+    var origCtx = origCvs.getContext("2d");
+
+    var monoCtx = monoCvs.getContext("2d");
+
+    var barcodePre = document.getElementById("barcode-pre");
+
+    origCvs.width = width;
+    origCvs.height = height;
+    monoCvs.width = width;
+    monoCvs.height = height;
+
+    origCtx.drawImage(img, 0, 0, width, height);
+    var origPixmap = new Balkenkode.Pixmap({
+        imageData: origCtx.getImageData(0, 0, width, height)
+    });
+
+    var grayscaleFilter = new Balkenkode.GrayscaleFilter({ canvas: origCtx });
+    var grayscalePixmap = grayscaleFilter.apply(origPixmap);
+
+    var monoFilter = new Balkenkode.MonochromeFilter({ canvas: origCtx });
+    var monoPixmap = monoFilter.apply(grayscalePixmap);
+    monoCtx.putImageData(monoPixmap.getImageData(), 0, 0);
+
+    var bitmapFilter = new Balkenkode.BitmapFilter();
+    var bitmap = bitmapFilter.apply(monoPixmap);
+
+    var runLengthFilter = new Balkenkode.RunLengthFilter();
+    var runLengthMap = runLengthFilter.apply(bitmap);
+    
+    var ean13PatternMatchFilter = new Balkenkode.EAN13PatternMatchFilter();
+    var numbers = ean13PatternMatchFilter.apply(runLengthMap);
+
+    var ean13DecisionFilter = new Balkenkode.EAN13DecisionFilter();
+    var barcode = ean13DecisionFilter.apply(numbers);
+
+    var str = null;
+    if (barcode.attributes && barcode.attributes.numbers) {
+      str = barcode.attributes.numbers.join('');
+    }
+    handleDecodeResult(str);
+};
+
+function handleDecodeResult(result) {
+  var resStr = '';
+  if (result) {
+    resStr = result.toString();
+  }
+
+  stats.endProc(images[curIdx], resStr);
+
+  if (curIdx < images.length - 1) {
+    //next
+    curIdx++;
+    decodeImage(images[curIdx]);
+  } else {
+    console.log('Done');
+    console.log(results);
+  }
+}
+
+    </script>
+  </body>
+</html>

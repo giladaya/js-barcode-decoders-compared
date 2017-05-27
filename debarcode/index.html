@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DeBarcode Test</title>
+        
+    <style>
+    </style>
+    
+  </head>
+  
+  <body>
+    <a href="https://github.com/giladaya/debarcode">DeBarcode</a><br/>
+    <div id="output">...</div>
+    <script src="https://rawgit.com/giladaya/debarcode/master/dist/Debarcode.min.js"></script>
+    <script src="../samples/images.js"></script>
+    <script src="../lib/Stats.js"></script>
+    <script>
+
+const BASE_URL = '/samples/'
+var curIdx = 0;
+
+var $output = document.getElementById('output');
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+
+var stats = new Stats($output);
+
+Debarcode.init(handleStatusUpdate);
+
+function decodeImage(url) {
+  var img = document.createElement('img');
+  // img.crossOrigin = "No CORS";
+  img.onload = function() {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0 );
+    var imgData = ctx.getImageData(0, 0, img.width, img.height);
+
+    stats.startProc();
+    Debarcode.decode(imgData, handleDecodeResult);
+  }
+  img.onerror = function(err) {
+    console.log('Error loading image ', url);
+  }
+  img.src = BASE_URL+url;
+}
+
+function handleDecodeResult(result) {
+  var resStr = '';
+  if (result.codes && result.codes.length > 0) {
+    resStr = result.codes[0].value.toString();
+  }
+
+  stats.endProc(images[curIdx], resStr);
+
+  if (curIdx < images.length - 1) {
+    //next
+    curIdx++;
+    decodeImage(images[curIdx]);
+  } else {
+    console.log('Done');
+  }
+}
+
+function handleStatusUpdate(err) {
+  if(err !== null) {
+    console.log('WebWorker init error', err);
+  } else {
+    console.log('WebWorker ready');
+
+    // start processing
+    decodeImage(images[curIdx]);
+  }
+}
+
+    </script>
+  </body>
+</html>

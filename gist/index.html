@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SlaRle Test</title>
+        
+    <style>
+    </style>
+    
+  </head>
+  
+  <body>
+    <a href="https://gist.github.com/tobytailor/421369">Gist by tobytailor</a><br/>
+    <div id="output">...</div>
+    <script src="./get_barcode_from_image.js"></script>
+    <script src="../samples/images.js"></script>
+    <script src="../lib/Stats.js"></script>
+    <script>
+const BASE_URL = '/samples/'
+var curIdx = 0;
+
+var $output = document.getElementById('output');
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+
+var stats = new Stats($output);
+
+// start processing
+decodeImage(images[curIdx]);
+
+function updateResults() {
+  //Correct: 24/1055 = %2 Avg time(ms): 26
+  const correctPct = Math.round(correctCount / processedCount * 100);
+  const avgTime = Math.round(totalTime / processedCount);
+  $output.innerText = 'Correct: ' + correctCount + '/' + processedCount + ' = %' + correctPct + ' Avg time(ms): ' + avgTime;
+}
+
+function decodeImage(url) {
+  var img = document.createElement('img');
+  // img.crossOrigin = "No CORS";
+  img.onload = function() {
+    stats.startProc();
+    var line = getBarcodeFromImage(img);
+    handleDecodeResult(line);
+  }
+  img.onerror = function(err) {
+    console.log('Error loading image ', url);
+  }
+  img.src = BASE_URL+url;
+}
+
+function handleDecodeResult(result) {
+  var resStr = '';
+  if (result) {
+    resStr = result;
+  }
+
+  stats.endProc(images[curIdx], resStr);
+
+  if (curIdx < images.length - 1) {
+    //next
+    curIdx++;
+    decodeImage(images[curIdx]);
+  } else {
+    console.log('Done');
+  }
+}
+    </script>
+  </body>
+</html>

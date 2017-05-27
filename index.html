@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QuaggaJs Test</title>
+        
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      tr {
+        border-bottom: 1px solid #ccc;
+      }
+      td {
+        vertical-align: top;
+        padding: 5px 10px;
+        border: 1px solid #efefef;
+      }
+      th {
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background-color: #efefff;
+      }
+    </style>
+    
+  </head>
+  
+  <body>
+    <h1>Test Results</h1>
+    <p>Comparison of pure javascript barcode decoding libraries</p>
+    <h4>Notes</h4>
+    <p>
+      <ul>
+        <li>Tests were ran with Chrome 58 on i7-4710HQ CPU @ 2.5GHz, using the image set from <a href="https://github.com/Rohrlaf/SlaRle.js">this repo</a></li>
+        <li>Click on accuracy number to run the tests for the relevant library</li>
+      </ul>
+    </p>
+
+    <table class="table table-bordered table-hover table-condensed">
+      <thead>
+        <tr>
+          <th title="Field #1">Library</th>
+          <th title="Field #2">Accuracy %</th>
+          <th title="Field #3">Avg time per image</th>
+          <th title="Field #4">Supported formats</th>
+          <th title="Field #5">Dependencies</th>
+          <th title="Field #6">Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://github.com/EddieLa/JOB">JOB</a></td>
+          <td align="right"><a href="job/index.html">84</a></td>
+          <td align="right">296</td>
+          <td>Code128, Code93, Code39, Standard/Industrial 2 of 5, Interleaved 2 of 5, Codabar and EAN-13</td>
+          <td>exif.js</td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td><a href="https://github.com/Rohrlaf/SlaRle.js">SlaRle.js</a></td>
+          <td align="right"><a href="slarle/index.html">84</a></td>
+          <td align="right">338</td>
+          <td>EAN-13</td>
+          <td>none</td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td><a href="https://github.com/giladaya/debarcode">DeBarcode</a></td>
+          <td align="right"><a href="debarcode/index.html">83</a></td>
+          <td align="right">179</td>
+          <td>EAN-13</td>
+          <td>none</td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td><a href="https://github.com/serratus/quaggaJS">QuaggaJs</a></td>
+          <td align="right"><a href="quaggajs/index.html">68</a></td>
+          <td align="right">186</td>
+          <td>EAN, CODE 128, CODE 39, EAN 8, UPC-A, UPC-C, I2of5 and CODABAR</td>
+          <td>none</td>
+          <td>Good locator</td>
+        </tr>
+        <tr>
+          <td><a href="https://github.com/liip/barcode.js">Barcode.js</a></td>
+          <td align="right"><a href="barcode.js/index.html">56</a></td>
+          <td align="right">11</td>
+          <td>EAN-13</td>
+          <td>none</td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td><a href="https://gist.github.com/tobytailor/421369">Gist by tobytailor</a></td>
+          <td align="right"><a href="gist/index.html">0</a></td>
+          <td align="right">26</td>
+          <td>EAN-13</td>
+          <td>none</td>
+          <td>Doesn't decode first digit</td>
+        </tr>
+        <tr>
+          <td><a href="https://bitbucket.org/jrosskopf/balkenkode">Balkenkode</a></td>
+          <td align="right">tbd</td>
+          <td align="right">tbd</td>
+          <td>EAN-13</td>
+          <td>jquery, underscore, backbone</td>
+          <td>Didn't get it working</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
